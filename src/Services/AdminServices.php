@@ -5,12 +5,9 @@ namespace App\Services;
 use App\DTO\AdminDTO;
 use App\Entity\Admin;
 use App\Repository\AdminRepository;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Cassandra\Uuid;
-use PhpParser\Node\Expr\Array_;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+
 
 class AdminServices
 {
@@ -33,6 +30,12 @@ class AdminServices
 
     }
 
+    public function findAdminById(string $id) : ?Admin
+    {
+        return $this->adminRepository->find($id) ?? null;
+
+    }
+
     public function createAdmin(AdminDTO $adminData): Admin | array
     {
         if($this->validateData($adminData))
@@ -40,25 +43,35 @@ class AdminServices
             return $this->validateData($adminData);
         }
 
-//        $user = new UserCreationStrategyFactory($userDto, $this->userCreator);
-//        $this->userCreator->setStrategy($user->createUserStrategy()); //tutaj może by ddalo rade zrobic trzy poziomy adminów.. supoeradmin, level gold, silver, bronze;
-//
-//
-//        $user = $this->userCreator->create($userDto, $this->userRepository);
 
-        $admin = new Admin();
-        print_r($admin->getId());
-        $admin->setId($admin->getId());
-        $admin->setFirstName($adminData->firstName);
-        $admin->setSecondName($adminData->secondName);
-        $admin->setEmail($adminData->email);
-        $admin->setEmployeeCode($adminData->employeeCode);
-        print_r($admin);
+        $strategy = new AdminStrategyFactory($adminData);
+        $strategy = $strategy->createAdminStrategy();
+        $adminCreator = new AdminCreator($this->adminRepository);
+        $adminCreator->setStrategy($strategy);
+
+        return    $adminCreator->createAdmin($adminData);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function updateAdmin(AdminDTO $adminDto, $id): Admin
+    {
+        $this->validateData($adminDto) && throw new \Exception();
+
+        $admin = $this->adminRepository->find($id) ?? null;
+        echo "I jave found one!";
+        if (!$admin) throw new \Exception();
+        $admin->setFirstName($adminDto->firstName);
+        $admin->setSecondName($adminDto->secondName);
+        $admin->setEmail($adminDto->email);
+
+
         $this->adminRepository->save($admin);
-        print_r(" ".$admin->getId());
-        echo "III've gone thaaat faar!";
-        print_r($admin);
+
         return $admin;
+
+
     }
 
     private function validateData(AdminDTO $data): array|null

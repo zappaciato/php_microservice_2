@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\DTO\AdminDTO;
 use App\Services\AdminServices;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +18,10 @@ class AdminController extends AbstractController
 
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     #[Route('/admins', name: 'app_admins', methods: ['GET'])]
     public function index(Request $request): JsonResponse
     {
@@ -25,23 +30,63 @@ class AdminController extends AbstractController
         return $this->json($admins);
     }
 
-//    #[Route('/admin/{id}', name: 'app_admin')]
-//    public function getUserById(Request $request, uuid $id): JsonResponse
-//    {
-//        $user = $this->userServices->getUserById($id);
-//
-//        return $this->json($user);
-//    }
+    /**
+     * @param string $id
+     * @return JsonResponse
+     */
+    #[Route('/admins/{id}', name: 'app_admin', methods: ['GET'])]
+    public function getUserById(string $id): JsonResponse
+    {
+        $admins= $this->adminServices->findAdminById($id);
 
+        return $this->json($admins);
+    }
+
+    /**
+     * @param Request $request
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
+     */
     #[Route('/admins ', name: 'create_admin', methods: ['POST'])]
-    public function createAdmin(Request             $request,
-                               SerializerInterface $serializer): JsonResponse
+    public function createAdmin(Request $request, SerializerInterface $serializer): JsonResponse
+    {
+        $adminData = $serializer->deserialize($request->getContent(), AdminDTO::class, "json");
+
+        $admin = $this->adminServices->createAdmin($adminData);
+
+        return $this->json($admin);
+    }
+
+    /**
+     * @param Request $request
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
+     */
+    #[Route('/admins/{id} ', name: 'update_admin', methods: ['PUT'])]
+    public function updateAdmin($id, Request $request, SerializerInterface $serializer): JsonResponse
+    {
+        try {
+            $updatedAdminDTO = $serializer->deserialize($request->getContent(), AdminDTO::class, "json");
+            $admin = $this->adminServices->updateAdmin($updatedAdminDTO, $id);
+
+        } catch(Exception $e) {
+
+            return $this->json('Unforseen Error Occurred!'.$e);
+        }
+
+        return $this->json($admin);
+
+    }
+
+    #[Route('/admins ', name: 'delete_admin', methods: ['POST'])]
+    public function deleteAdmin(Request             $request,
+                                SerializerInterface $serializer): JsonResponse
     {
 
         $adminData = $serializer->deserialize($request->getContent(), AdminDTO::class, "json");
 
-        $user = $this->adminServices->createAdmin($adminData);
+        $admin = $this->adminServices->createAdmin($adminData);
 
-        return $this->json($user);
+        return $this->json($admin);
     }
 }
