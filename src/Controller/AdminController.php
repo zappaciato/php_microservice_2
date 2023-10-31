@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\DTO\AdminDTO;
 use App\Services\AdminServices;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -37,9 +38,9 @@ class AdminController extends AbstractController
                                SerializerInterface $serializer): JsonResponse
     {
 
-//        $userData = $serializer->deserialize($request->getContent(), UserDTO::class, "json");
+        $adminData = $serializer->deserialize($request->getContent(), AdminDTO::class, "json");
 
-        $user = $this->userServices->createUser($userData);
+        $user = $this->adminServices->createAdmin($adminData);
 
         return $this->json($user);
     }

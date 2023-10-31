@@ -11,7 +11,7 @@ class AdminDTO
 
 //    #[Assert\NotNull]
 //    #[NotBlank]
-    public string $lastName = '';
+    public string $secondName = '';
 
 //    #[Assert\NotNull]
 //    #[NotBlank]
@@ -24,6 +24,6 @@ class AdminDTO
 //    #[NotBlank]
 //    #[Type('int')]
 //    #[Length(max: 9)]
-    public int $phoneNumber = 0;
+    public string $employeeCode = '';
 
 }

@@ -12,8 +12,9 @@ use Symfony\Component\Uid\Uuid;
 class Admin
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     private ?string $id = null;
 
     #[ORM\Column(length: 255)]
@@ -22,20 +23,26 @@ class Admin
     #[ORM\Column(length: 255)]
     private ?string $second_name = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $email = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $employeeCode = null;
 
-    public function __construct()
-    {
-        $this->id = Uuid::v4();
-    }
+//    public function __construct()
+//    {
+//        $this->id = Uuid::v4();
+//    }
 
     public function getId(): ?string
     {
         return $this->id;
+    }
+
+    public function setId($id): static
+    {
+        $this->id = $id;
+        return $this;
     }
 
     public function getFirstName(): ?string

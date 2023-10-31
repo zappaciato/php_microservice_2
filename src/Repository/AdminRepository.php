@@ -21,6 +21,15 @@ class AdminRepository extends ServiceEntityRepository
         parent::__construct($registry, Admin::class);
     }
 
+    public function save(Admin $admin) : Admin
+    {
+        $this->getEntityManager()->persist($admin);
+        $this->getEntityManager()->flush($admin);
+
+        return $admin;
+    }
+
+
 //    /**
 //     * @return Admin[] Returns an array of Admin objects
 //     */
