@@ -7,6 +7,10 @@ use App\Interfaces\AdminCreatorStrategyInterface;
 
 class SuperAdmin implements AdminCreatorStrategyInterface
 {
+    /**
+     * @param AdminDTO $adminData
+     * @return \App\Entity\Admin
+     */
     public function createAdmin(AdminDTO $adminData): \App\Entity\Admin
     {
         $admin = new \App\Entity\Admin();

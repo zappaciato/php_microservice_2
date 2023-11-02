@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\AdminRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Bridge\Doctrine\Types\UuidType;
@@ -28,6 +30,14 @@ class Admin
 
     #[ORM\Column(length: 255, unique: true)]
     private ?string $employeeCode = null;
+
+    #[ORM\OneToMany(mappedBy: 'relation', targetEntity: File::class)]
+    private Collection $files;
+
+    public function __construct()
+    {
+        $this->files = new ArrayCollection();
+    }
 
 //    public function __construct()
 //    {
@@ -89,6 +99,36 @@ class Admin
     public function setEmployeeCode(string $employeeCode): static
     {
         $this->employeeCode = $employeeCode;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, File>
+     */
+    public function getFiles(): Collection
+    {
+        return $this->files;
+    }
+
+    public function addFile(File $file): static
+    {
+        if (!$this->files->contains($file)) {
+            $this->files->add($file);
+            $file->setRelation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFile(File $file): static
+    {
+        if ($this->files->removeElement($file)) {
+            // set the owning side to null (unless already changed)
+            if ($file->getRelation() === $this) {
+                $file->setRelation(null);
+            }
+        }
 
         return $this;
     }

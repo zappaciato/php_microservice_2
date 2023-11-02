@@ -11,6 +11,11 @@ class EmployeeCodeAnalyzer implements CodeAnalyzerInterface
     {
         $this->employeeCode = $employeeCode;
     }
+
+    /**
+     * @return $this
+     * @throws \Exception
+     */
     public function validateCode(): static
     {
         //validation logic
@@ -22,6 +27,10 @@ class EmployeeCodeAnalyzer implements CodeAnalyzerInterface
 
         return $this;
     }
+
+    /**
+     * @return $this
+     */
     public function refactorCode(): static
     {
         $this->employeeCode = strrev($this->employeeCode);
@@ -30,6 +39,10 @@ class EmployeeCodeAnalyzer implements CodeAnalyzerInterface
 
     }
 
+    /**
+     * @return string
+     * @throws \Exception
+     */
     public function extractInformationFromRefactoredCode(): string
     {
         $this->employeeCode = strtoupper($this->employeeCode);

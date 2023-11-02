@@ -57,6 +57,7 @@ class AdminController extends AbstractController
     #[Route('/admins ', name: 'create_admin', methods: ['POST'])]
     public function createAdmin(Request $request, SerializerInterface $serializer): JsonResponse
     {
+        print_r($request->getContent());
         $adminData = $serializer->deserialize($request->getContent(), AdminDTO::class, "json");
 
         $admin = $this->adminServices->createAdmin($adminData);
@@ -69,6 +70,8 @@ class AdminController extends AbstractController
             'message' => 'User created successfully',
             'admin' => ['email' => $admin->getEmail(), 'employee_code' => $admin->getEmployeeCode()]], 200);
     }
+
+
 
     /**
      * @param Request $request
