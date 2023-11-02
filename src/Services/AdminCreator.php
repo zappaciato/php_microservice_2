@@ -11,22 +11,35 @@ use App\Repository\AdminRepository;
 class AdminCreator
 {
 
+    /**
+     * @var AdminCreatorStrategyInterface
+     */
     private AdminCreatorStrategyInterface $adminStrategy;
+    /**
+     * @var AdminRepository
+     */
     private AdminRepository $adminRepository;
 
+    /**
+     * @param AdminRepository $adminRepository
+     */
     public function __construct(AdminRepository $adminRepository)
     {
-
         $this->adminRepository = $adminRepository;
+
     }
 
-    public function setStrategy(AdminCreatorStrategyInterface $strategy) : void
+    /**
+     * @param AdminCreatorStrategyInterface $strategy
+     * @return $this
+     */
+    public function setStrategy(AdminCreatorStrategyInterface $strategy) : self
     {
         $this->adminStrategy = $strategy;
-
+        return $this;
     }
 
-    public function getStrategy()
+    public function getStrategy(): AdminCreatorStrategyInterface
     {
         return $this->adminStrategy;
     }

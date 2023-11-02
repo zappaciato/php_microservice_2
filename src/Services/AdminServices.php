@@ -42,7 +42,7 @@ class AdminServices
 
     /**
      * @param AdminDTO $adminData
-     * @return Admin|array
+     * @return Admin|JsonResponse
      */
     public function createAdmin(AdminDTO $adminData): Admin | JsonResponse
     {
@@ -55,11 +55,9 @@ class AdminServices
         }
 
         $strategy = new AdminStrategyFactory($adminData);
-        $strategy = $strategy->createAdminStrategy();
         $adminCreator = new AdminCreator($this->adminRepository);
-        $adminCreator->setStrategy($strategy);
 
-        return    $adminCreator->createAdmin($adminData);
+        return $adminCreator->setStrategy($strategy->createAdminStrategy())->createAdmin($adminData);
     }
 
     /**
@@ -77,7 +75,6 @@ class AdminServices
         $admin->setFirstName($adminDto->firstName);
         $admin->setSecondName($adminDto->secondName);
         $admin->setEmail($adminDto->email);
-
 
         $this->adminRepository->save($admin);
 

@@ -3,11 +3,13 @@
 namespace App\Services;
 
 use App\Admins\Admin;
+use App\Admins\SuperAdmin;
 use App\DTO\AdminDTO;
-use App\interfaces\AdminCreatorStrategyInterface;
+use App\Interfaces\AdminCreatorStrategyInterface;
 
 class AdminStrategyFactory
 {
+
     private AdminDTO $adminData;
 //    private AdminCreatorStrategyInterface $strategy;
 
@@ -19,16 +21,13 @@ class AdminStrategyFactory
 
     public function createAdminStrategy(): AdminCreatorStrategyInterface
     {
-//        $strategy = match (true) {
-//            Roles::analyzeEmail($this->userDto) && Roles::analyzePhoneNumber($this->userDto)    => new AdminUserStrategy(),
-//            Roles::analyzeEmail($this->userDto) || Roles::analyzePhoneNumber($this->userDto)    => new VipUserStrategy(),
-//            default                                                                             => new SimpleUserStrategy()
-//
-//        };
-        $strategy = new Admin();
-echo "jestem w create admin staregy";
-        return $strategy;
-
+        $code = new EmployeeCodeAnalyzer($this->adminData->employeeCode);
+print_r($this->adminData->employeeCode);
+        return
+            match ($code->validateCode()->refactorCode()->extractInformationFromRefactoredCode()) {
+            "SuperAdmin"    => new SuperAdmin(),
+            default         => new Admin()
+        };
     }
 
 }

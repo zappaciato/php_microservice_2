@@ -60,13 +60,14 @@ class AdminController extends AbstractController
         $adminData = $serializer->deserialize($request->getContent(), AdminDTO::class, "json");
 
         $admin = $this->adminServices->createAdmin($adminData);
-        if(!$admin instanceof Admin) {
-            return new JsonResponse(['message' => 'Something has gone terribly wrong.', 'admin'=> $admin], 400);
-        }
+
+        if (!$admin instanceof Admin) {
+            return $admin;
+        };
+
         return new JsonResponse([
             'message' => 'User created successfully',
             'admin' => ['email' => $admin->getEmail(), 'employee_code' => $admin->getEmployeeCode()]], 200);
-
     }
 
     /**

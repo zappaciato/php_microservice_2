@@ -31,10 +31,10 @@ class AdminDTO
     #[NotBlank]
     #[Type('string')]
     #[Length(max: 9, maxMessage:'The value is too long. Max length is {{limit}}.')]
-    #[Regex(
-        pattern: '/^\d{2}[A-Z]{2}\d{2}$/', //example employee number: 34CP87
-        message: 'The employee number is not in the expected format.: i.e. "34CP87"'
-    )]
+//    #[Regex(
+//        pattern: '/^\d{2}[A-Z]{2}\d{2}$/', //example employee number: 34CP87
+//        message: 'The employee number is not in the expected format.: i.e. "34CP87"'
+//    )]
     public string $employeeCode = '';
 
 }
