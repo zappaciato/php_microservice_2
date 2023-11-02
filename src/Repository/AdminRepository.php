@@ -29,6 +29,14 @@ class AdminRepository extends ServiceEntityRepository
         return $admin;
     }
 
+    public function delete(Admin $admin): Admin
+    {
+        $this->getEntityManager()->remove($admin);
+        $this->getEntityManager()->flush();
+
+        return $admin;
+    }
+
 
 //    /**
 //     * @return Admin[] Returns an array of Admin objects

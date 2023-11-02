@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\DTO\AdminDTO;
+use App\Entity\Admin;
 use App\Services\AdminServices;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,8 +26,11 @@ class AdminController extends AbstractController
     #[Route('/admins', name: 'app_admins', methods: ['GET'])]
     public function index(Request $request): JsonResponse
     {
-        $admins= $this->adminServices->getAllAdmins();
+        $admins = $this->adminServices->getAllAdmins();
 
+        if(empty($admins)) {
+            return new JsonResponse(['message' => 'No users found'], 404);
+        }
         return $this->json($admins);
     }
 
@@ -37,9 +41,12 @@ class AdminController extends AbstractController
     #[Route('/admins/{id}', name: 'app_admin', methods: ['GET'])]
     public function getUserById(string $id): JsonResponse
     {
-        $admins= $this->adminServices->findAdminById($id);
+        $admin = $this->adminServices->findAdminById($id);
+        if(empty($admin)) {
 
-        return $this->json($admins);
+            return new JsonResponse(['message' => 'Admin not found', 'admin' => $admin], 404);
+        }
+        return new JsonResponse(['message' => 'Admin found!!!', 'admin' => $admin->getEmail()], 200);
     }
 
     /**
@@ -53,8 +60,13 @@ class AdminController extends AbstractController
         $adminData = $serializer->deserialize($request->getContent(), AdminDTO::class, "json");
 
         $admin = $this->adminServices->createAdmin($adminData);
+        if(!$admin instanceof Admin) {
+            return new JsonResponse(['message' => 'Something has gone terribly wrong.', 'admin'=> $admin], 400);
+        }
+        return new JsonResponse([
+            'message' => 'User created successfully',
+            'admin' => ['email' => $admin->getEmail(), 'employee_code' => $admin->getEmployeeCode()]], 200);
 
-        return $this->json($admin);
     }
 
     /**
@@ -74,19 +86,36 @@ class AdminController extends AbstractController
             return $this->json('Unforseen Error Occurred!'.$e);
         }
 
-        return $this->json($admin);
+        return new JsonResponse(['message' => 'Admin updated!', 'admin' => $admin->getEmail()], 200);
 
     }
 
-    #[Route('/admins ', name: 'delete_admin', methods: ['POST'])]
-    public function deleteAdmin(Request             $request,
-                                SerializerInterface $serializer): JsonResponse
+    /**
+     * @param $id
+     * @return JsonResponse|null
+     */
+    #[Route('/admins/{id} ', name: 'delete_admin', methods: ['DELETE'])]
+    public function deleteAdmin($id): ?JsonResponse
     {
+        try {
+            $admin = $this->adminServices->deleteAdmin($id);
+        } catch (Exception $e) {
+            return $this->json($e->getMessage());
+        }
 
-        $adminData = $serializer->deserialize($request->getContent(), AdminDTO::class, "json");
-
-        $admin = $this->adminServices->createAdmin($adminData);
-
-        return $this->json($admin);
+        return new JsonResponse(['message' => 'Admin deleted successfully', 'admin' => $admin->getEmail()], 200);
     }
+
+//    #[Route('/admins/athorized ', name: 'delete_admin', methods: ['GET'])]
+//    public function getAdminAuthList($id): ?JsonResponse
+//    {
+//        try {
+//            $admins= $this->adminServices->getAllAdmins();
+//        } catch (Exception $e) {
+//            return $this->json($e->getMessage());
+//        }
+//
+//        return $this->json('success');
+//    }
+
 }

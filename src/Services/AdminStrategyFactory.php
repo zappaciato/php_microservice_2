@@ -14,6 +14,7 @@ class AdminStrategyFactory
     public function __construct(AdminDTO $adminData)
     {
         $this->adminData = $adminData;
+
     }
 
     public function createAdminStrategy(): AdminCreatorStrategyInterface

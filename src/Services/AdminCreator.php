@@ -33,7 +33,6 @@ class AdminCreator
 
     public function createAdmin(AdminDTO $adminDto): Admin
     {
-        echo "I zasejwoalem!";
         $admin = $this->adminStrategy->createAdmin($adminDto);
         $this->adminRepository->save($admin);
 

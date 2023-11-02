@@ -30,19 +30,29 @@ class AdminServices
 
     }
 
+    /**
+     * @param string $id
+     * @return Admin|null
+     */
     public function findAdminById(string $id) : ?Admin
     {
         return $this->adminRepository->find($id) ?? null;
 
     }
 
-    public function createAdmin(AdminDTO $adminData): Admin | array
+    /**
+     * @param AdminDTO $adminData
+     * @return Admin|array
+     */
+    public function createAdmin(AdminDTO $adminData): Admin | JsonResponse
     {
         if($this->validateData($adminData))
         {
-            return $this->validateData($adminData);
+            return new JsonResponse([
+                'message' => 'Validation was not successful!',
+                'errors' => $this->validateData($adminData)
+            ]);
         }
-
 
         $strategy = new AdminStrategyFactory($adminData);
         $strategy = $strategy->createAdminStrategy();
@@ -53,6 +63,9 @@ class AdminServices
     }
 
     /**
+     * @param AdminDTO $adminDto
+     * @param $id
+     * @return Admin
      * @throws \Exception
      */
     public function updateAdmin(AdminDTO $adminDto, $id): Admin
@@ -60,7 +73,6 @@ class AdminServices
         $this->validateData($adminDto) && throw new \Exception();
 
         $admin = $this->adminRepository->find($id) ?? null;
-        echo "I jave found one!";
         if (!$admin) throw new \Exception();
         $admin->setFirstName($adminDto->firstName);
         $admin->setSecondName($adminDto->secondName);
@@ -71,9 +83,27 @@ class AdminServices
 
         return $admin;
 
-
     }
 
+    /**
+     * @param $id
+     * @return Admin
+     * @throws \Exception
+     */
+    public function deleteAdmin($id): Admin
+    {
+        $admin = $this->adminRepository->find($id) ?? null;
+        if (!$admin) throw new \Exception();
+
+        $this->adminRepository->delete($admin);
+
+        return $admin;
+    }
+
+    /**
+     * @param AdminDTO $data
+     * @return array|null
+     */
     private function validateData(AdminDTO $data): array|null
     {
 

@@ -8,6 +8,10 @@ use App\interfaces\AdminCreatorStrategyInterface;
 class Admin implements AdminCreatorStrategyInterface
 {
 
+    /**
+     * @param AdminDTO $adminData
+     * @return \App\Entity\Admin
+     */
     public function createAdmin(AdminDTO $adminData): \App\Entity\Admin
     {
         $admin = new \App\Entity\Admin();
@@ -15,7 +19,6 @@ class Admin implements AdminCreatorStrategyInterface
         $admin->setSecondName($adminData->secondName);
         $admin->setEmail($adminData->email);
         $admin->setEmployeeCode($adminData->employeeCode);
-//        $this->adminRepository->save($admin);
 
         return $admin;
     }
