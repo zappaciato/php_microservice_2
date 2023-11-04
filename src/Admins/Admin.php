@@ -3,6 +3,7 @@
 namespace App\Admins;
 
 use App\DTO\AdminDTO;
+use App\Entity\File;
 use App\interfaces\AdminCreatorStrategyInterface;
 
 class Admin implements AdminCreatorStrategyInterface
@@ -20,7 +21,23 @@ class Admin implements AdminCreatorStrategyInterface
         $admin->setEmail($adminData->email);
         $admin->setEmployeeCode($adminData->employeeCode);
 
+        if (isset($adminData->files)) {
+
+            foreach ($adminData->files as $file) {
+                $file = new File();
+                $file
+                    ->setName($file['fileName'])
+                    ->setPath($file['path'])
+                    ->setRelation($admin)
+                    ->setUploadDate('2022-03-22');
+
+    echo "jestem w ADMIN normlany create last";
+                $admin->addFile($file);
+
+
+            }
+
+        }
         return $admin;
     }
-
 }

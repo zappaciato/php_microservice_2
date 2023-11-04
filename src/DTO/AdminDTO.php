@@ -1,6 +1,9 @@
 <?php
 namespace App\DTO;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Constraints\Email;
@@ -12,14 +15,19 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class AdminDTO
 {
+
+
+    #[Groups('adminDTO')]
     #[Assert\NotNull, NotBlank]
     #[Length(max: 9)]
     public string $firstName = '';
 
+    #[Groups('adminDTO')]
     #[Assert\NotNull]
     #[NotBlank]
     public string $secondName = '';
 
+    #[Groups('adminDTO')]
     #[Assert\NotNull]
     #[NotBlank]
     #[Email(
@@ -27,6 +35,7 @@ class AdminDTO
     )]
     public string $email = '';
 
+    #[Groups('adminDTO')]
     #[Assert\NotNull]
     #[NotBlank]
     #[Type('string')]
@@ -37,4 +46,11 @@ class AdminDTO
 //    )]
     public string $employeeCode = '';
 
+//    #[Type('FileDTO')]
+//    /** @var $files FileDTO<FileDTO>  */
+//    public FileDTO $files;
+    #[Groups('admin')]
+    #[Type('array')]
+    /** @var $files array<FileDTO>  */
+    public array $files;
 }

@@ -7,6 +7,7 @@ use App\DTO\AdminDTO;
 use App\interfaces\AdminCreatorStrategyInterface;
 use App\Interfaces\AdminStrategyInterface;
 use App\Repository\AdminRepository;
+use App\Repository\FileRepository;
 
 class AdminCreator
 {
@@ -47,7 +48,11 @@ class AdminCreator
     public function createAdmin(AdminDTO $adminDto): Admin
     {
         $admin = $this->adminStrategy->createAdmin($adminDto);
+//        dd($admin);
+
+
         $this->adminRepository->save($admin);
+
 
         return $admin;
 

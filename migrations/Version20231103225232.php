@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20231031143435 extends AbstractMigration
+final class Version20231103225232 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,18 +20,22 @@ final class Version20231031143435 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('DROP SEQUENCE admin_id_seq CASCADE');
         $this->addSql('CREATE TABLE admin (id UUID NOT NULL, first_name VARCHAR(255) NOT NULL, second_name VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, employee_code VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_880E0D76E7927C74 ON admin (email)');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_880E0D76C2CC7ADF ON admin (employee_code)');
         $this->addSql('COMMENT ON COLUMN admin.id IS \'(DC2Type:uuid)\'');
+        $this->addSql('CREATE TABLE file (id INT NOT NULL, relation_id UUID DEFAULT NULL, name VARCHAR(255) NOT NULL, path VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE INDEX IDX_8C9F36103256915B ON file (relation_id)');
+        $this->addSql('COMMENT ON COLUMN file.relation_id IS \'(DC2Type:uuid)\'');
+        $this->addSql('ALTER TABLE file ADD CONSTRAINT FK_8C9F36103256915B FOREIGN KEY (relation_id) REFERENCES admin (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE SCHEMA public');
-        $this->addSql('CREATE SEQUENCE admin_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('ALTER TABLE file DROP CONSTRAINT FK_8C9F36103256915B');
         $this->addSql('DROP TABLE admin');
+        $this->addSql('DROP TABLE file');
     }
 }

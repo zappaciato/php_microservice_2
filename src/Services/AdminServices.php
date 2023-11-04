@@ -24,9 +24,10 @@ class AdminServices
     /**
      * @return array<Admin|null>
      */
-    public function getAllAdmins(): array
+    public function getAllAdmins(): array | null
     {
-        return $this->adminRepository->findAll();
+//        file_put_contents('logs.txt', json_encode($this->adminRepository->findAll()));
+        return $this->adminRepository->findAll() ?? null;
 
     }
 
@@ -58,6 +59,7 @@ class AdminServices
         $adminCreator = new AdminCreator($this->adminRepository);
 
         return $adminCreator->setStrategy($strategy->createAdminStrategy())->createAdmin($adminData);
+//        return new JsonResponse("działa");
     }
 
     /**

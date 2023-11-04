@@ -8,31 +8,39 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: AdminRepository::class)]
 class Admin
 {
+
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\Column(type: 'uuid', unique: true)]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     private ?string $id = null;
 
+    #[Groups(['adminDTO'])]
     #[ORM\Column(length: 255)]
     private ?string $first_name = null;
 
+    #[Groups(['adminDTO'])]
     #[ORM\Column(length: 255)]
     private ?string $second_name = null;
 
+    #[Groups(['adminDTO'])]
     #[ORM\Column(length: 255, unique: true)]
     private ?string $email = null;
 
+    #[Groups(['adminDTO'])]
     #[ORM\Column(length: 255, unique: true)]
     private ?string $employeeCode = null;
 
-    #[ORM\OneToMany(mappedBy: 'relation', targetEntity: File::class)]
+
+    #[ORM\OneToMany(mappedBy: 'admin', targetEntity: File::class, cascade: ['persist'], orphanRemoval: true)]
     private Collection $files;
+
 
     public function __construct()
     {
@@ -113,6 +121,7 @@ class Admin
 
     public function addFile(File $file): static
     {
+
         if (!$this->files->contains($file)) {
             $this->files->add($file);
             $file->setRelation($this);

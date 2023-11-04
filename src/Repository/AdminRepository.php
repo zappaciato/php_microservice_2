@@ -3,7 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Admin;
+use App\Entity\File;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -36,7 +38,6 @@ class AdminRepository extends ServiceEntityRepository
 
         return $admin;
     }
-
 
 //    /**
 //     * @return Admin[] Returns an array of Admin objects

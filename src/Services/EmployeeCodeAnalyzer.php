@@ -19,9 +19,10 @@ class EmployeeCodeAnalyzer implements CodeAnalyzerInterface
     public function validateCode(): static
     {
         //validation logic
-        $pattern = '/^\d{2}[A-Z]{2}\d{2}$/';
-        if(!preg_match($pattern, $this->employeeCode)) {
+        $pattern = '/^[A-Z]{2}\d{2}[A-Z]{2}$/';
 
+        if(!preg_match($pattern, strtoupper($this->employeeCode))) {
+//dd($this->employeeCode);
             return throw new \Exception('Employee code is in the wrong format!');
         }
 

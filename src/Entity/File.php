@@ -5,27 +5,37 @@ namespace App\Entity;
 use App\Repository\FileRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: FileRepository::class)]
 class File
 {
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups('adminDTO')]
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    private ?string $fileName = null;
 
+    #[Groups('adminDTO')]
     #[ORM\Column(length: 255)]
     private ?string $path = null;
 
+
+    #[Groups('adminDTO')]
     #[ORM\ManyToOne(inversedBy: 'files')]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Admin $relation = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $uploadDate = null;
+
+//    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+//    private ?\DateTimeInterface $uploadDate = null;
+//
+    private string $uploadDate = '';
 
     public function getId(): ?int
     {
@@ -80,7 +90,7 @@ class File
         return $this->uploadDate;
     }
 
-    public function setUploadDate(\DateTimeInterface $uploadDate): static
+    public function setUploadDate(string $uploadDate): static
     {
         $this->uploadDate = $uploadDate;
 

@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\File;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -21,6 +22,14 @@ class FileRepository extends ServiceEntityRepository
         parent::__construct($registry, File::class);
     }
 
+    public function save(Collection $file): Collection
+    {
+
+        $this->getEntityManager()->persist($file);
+        $this->getEntityManager()->flush($file);
+
+        return $file;
+    }
 //    /**
 //     * @return File[] Returns an array of File objects
 //     */
