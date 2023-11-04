@@ -14,28 +14,30 @@ class SuperAdmin implements AdminCreatorStrategyInterface
      */
     public function createAdmin(AdminDTO $adminData): \App\Entity\Admin
     {
+
         $admin = new \App\Entity\Admin();
         $admin->setFirstName($adminData->firstName);
         $admin->setSecondName($adminData->secondName);
         $admin->setEmail($adminData->email);
         $admin->setEmployeeCode($adminData->employeeCode);
-
-        if (isset($adminData->files)) {
-
+        echo ":::::::::::::::::::::::::::::::::::::::::::I AM IN:::::::::::::::::::::::::::::::::::::::";
+        var_dump($adminData->files['fileName']);
+        if (!empty($adminData->files)) {
 
 //            foreach ($adminData->files as $file) {
 
                 $uploadedFile = new File();
                 $uploadedFile
-                    ->setName($adminData->files['fileName'])
+                    ->setFileName($adminData->files['fileName'])
                     ->setPath($adminData->files['path'])
+                    ->setRelation($admin)
                     ->setUploadDate('2022-03-22');
 
 
                 $admin->addFile($uploadedFile);
 
             }
-        echo "Jestem w adminDataFIle";
+//            print_r($admin);
 //        }
         return $admin;
     }

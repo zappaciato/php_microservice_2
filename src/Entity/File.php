@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\DTO\FileDTO;
 use App\Repository\FileRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -13,20 +14,21 @@ class File
 {
 
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    private ?Uuid $id = null;
 
-    #[Groups('adminDTO')]
+
     #[ORM\Column(length: 255)]
     private ?string $fileName = null;
 
-    #[Groups('adminDTO')]
+
     #[ORM\Column(length: 255)]
     private ?string $path = null;
 
 
-    #[Groups('adminDTO')]
+
     #[ORM\ManyToOne(inversedBy: 'files')]
     #[ORM\JoinColumn(nullable: true)]
     private ?Admin $relation = null;
@@ -37,7 +39,7 @@ class File
 //
     private string $uploadDate = '';
 
-    public function getId(): ?int
+    public function getId(): ?Uuid
     {
         return $this->id;
     }
@@ -49,14 +51,14 @@ class File
         return $this;
     }
 
-    public function getName(): ?string
+    public function getFileName(): ?string
     {
-        return $this->name;
+        return $this->fileName;
     }
 
-    public function setName(string $name): static
+    public function setFileName($fileName): static
     {
-        $this->name = $name;
+        $this->fileName = $fileName;
 
         return $this;
     }
@@ -85,7 +87,7 @@ class File
         return $this;
     }
 
-    public function getUploadDate(): ?\DateTimeInterface
+    public function getUploadDate(): ?string
     {
         return $this->uploadDate;
     }

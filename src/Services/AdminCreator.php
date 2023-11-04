@@ -48,8 +48,6 @@ class AdminCreator
     public function createAdmin(AdminDTO $adminDto): Admin
     {
         $admin = $this->adminStrategy->createAdmin($adminDto);
-//        dd($admin);
-
 
         $this->adminRepository->save($admin);
 

@@ -26,7 +26,7 @@ class Admin implements AdminCreatorStrategyInterface
             foreach ($adminData->files as $file) {
                 $file = new File();
                 $file
-                    ->setName($file['fileName'])
+                    ->setFileName($file['fileName'])
                     ->setPath($file['path'])
                     ->setRelation($admin)
                     ->setUploadDate('2022-03-22');

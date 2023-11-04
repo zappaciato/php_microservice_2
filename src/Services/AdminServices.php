@@ -47,6 +47,7 @@ class AdminServices
      */
     public function createAdmin(AdminDTO $adminData): Admin | JsonResponse
     {
+    var_dump($adminData);
         if($this->validateData($adminData))
         {
             return new JsonResponse([

@@ -10,12 +10,12 @@ use Symfony\Component\Validator\Constraints\Date;
 class FileDTO
 {
 
-    #[Groups('adminDTO')]
+    #[Groups('fileDTO')]
     private ?string $fileName = null;
-    #[Groups('adminDTO')]
-    private ?string $uploadDate = '23.04.2023';
+    #[Groups('fileDTO')]
+    private ?string $uploadDate = '';
 
-    #[Groups('adminDTO')]
+    #[Groups('fileDTO')]
     private ?string $path = null;
 
     // #[Assert\NotNull]
