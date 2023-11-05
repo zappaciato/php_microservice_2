@@ -33,9 +33,10 @@ class AdminController extends AbstractController
     {
         $admins = $this->adminServices->getAllAdmins();
 
-        if(empty($admins)) {
-            return new JsonResponse(['message' => 'No users found'], 204); //no content status/ dobrze to zrobic HTTP::
+        if(count($admins) === 0) {
+            return new JsonResponse(['message' => 'No users found'], 404); //no content status/ dobrze to zrobic HTTP::
         }
+
         return $this->json($admins);
     }
 
@@ -51,7 +52,7 @@ class AdminController extends AbstractController
 
             return new JsonResponse(['message' => 'Admin not found', 'admin' => $admin], 404);
         }
-//        return new JsonResponse(['message' => 'Admin found!!!', 'admin' => $admin->getEmail()], 200);
+
         return $this->json($admin, 200, ['message' => 'Admin found!!!'], []);
     }
 
@@ -63,39 +64,14 @@ class AdminController extends AbstractController
     #[Route('/admins ', name: 'create_admin', methods: ['POST'])]
     public function createAdmin(Request $request, SerializerInterface $serializer): JsonResponse
     {
-        $requestData = [
-            'firstName'     => $request->request->get('firstName'),
-            'secondName'    => $request->request->get('secondName'),
-            'email'         => $request->request->get('email'),
-            'employeeCode'  => $request->request->get('employeeCode')
-        ];
+        $requestData = $request->request->all();
+        $file =  $request->files->get('file');
 
-        $files =  $request->files;
-        $fileData = [];
-        foreach ($files as $file) {
-            $fileName = $file->getClientOriginalName();
-//            $fileName = $file->getClientOriginalName() .uniqid(). $file->guessExtension();
-            $path = 'Files/';
+        $adminData = $serializer->denormalize($requestData, AdminDTO::class, "array", ['groups' => 'adminDTO']);
 
-            $fileData = [
-                'fileName' => $fileName,
-                'path' => $path,
-                'uploadDate' => "2023-11-02T22:21:23",
-            ];
-//        Uncomment later IMPORTANT!    $file->move($fileData['path'], $fileData['fileName']);
+        $admin = $this->adminServices->createAdmin($adminData, $file);
 
-        }
-        $requestData['files'] = $fileData;
-//        var_dump($requestData);
-//        $requestData = json_encode($requestData);
-//        file_put_contents('logs_kris_debug.txt', $requestData);
-        $adminData = $serializer->denormalize($requestData, AdminDTO::class, "array", ['groups' => 'adminDTO', 'maxDepth' => 2]);
-//        $adminData = $serializer->denormalize($requestData, AdminDTO::class, "array");
-        file_put_contents('logs_kris_debug.txt', json_encode($adminData));
-        $admin = $this->adminServices->createAdmin($adminData);
-        file_put_contents('logs_kris_debug2.txt', json_encode($admin));
-
-        return $this->json($admin, 200, [], []);
+        return $this->json($admin, 200, ['message' => 'New Admin added!'], []);
 
     }
 
@@ -118,7 +94,6 @@ class AdminController extends AbstractController
             return $this->json('Unforseen Error Occurred!'.$e);
         }
 
-//        return new JsonResponse(['message' => 'Admin updated!', 'admin' => $admin->getEmail()], 200);
         return $this->json($admin, 200, ['message' => 'Admin updated!'], []);
     }
 
@@ -135,20 +110,6 @@ class AdminController extends AbstractController
             return $this->json($e->getMessage());
         }
 
-//        return new JsonResponse(['message' => 'Admin deleted successfully', 'admin' => $admin->getEmail()], 200);
         return $this->json($admin, 200, ['message' => 'Admin deleted successfully'], []);
     }
-
-//    #[Route('/admins/athorized ', name: 'delete_admin', methods: ['GET'])]
-//    public function getAdminAuthList($id): ?JsonResponse
-//    {
-//        try {
-//            $admins= $this->adminServices->getAllAdmins();
-//        } catch (Exception $e) {
-//            return $this->json($e->getMessage());
-//        }
-//
-//        return $this->json('success');
-//    }
-
 }

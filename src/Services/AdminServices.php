@@ -4,7 +4,10 @@ namespace App\Services;
 
 use App\DTO\AdminDTO;
 use App\Entity\Admin;
+use App\Entity\File;
 use App\Repository\AdminRepository;
+use App\Repository\FileRepository;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -13,12 +16,14 @@ class AdminServices
 {
     private AdminRepository $adminRepository;
     private ValidatorInterface $validator;
+    private FileService $fileService;
+    private FileRepository $fileRepository;
 
-    public function __construct(AdminRepository $adminRepository, ValidatorInterface $validator)
+    public function __construct(AdminRepository $adminRepository, ValidatorInterface $validator, FileRepository $fileRepository)
     {
         $this->adminRepository = $adminRepository;
-
         $this->validator = $validator;
+        $this->fileRepository = $fileRepository;
     }
 
     /**
@@ -26,9 +31,8 @@ class AdminServices
      */
     public function getAllAdmins(): array | null
     {
-//        file_put_contents('logs.txt', json_encode($this->adminRepository->findAll()));
-        return $this->adminRepository->findAll() ?? null;
 
+        return $this->adminRepository->findAll() ?? null;
     }
 
     /**
@@ -45,9 +49,8 @@ class AdminServices
      * @param AdminDTO $adminData
      * @return Admin|JsonResponse
      */
-    public function createAdmin(AdminDTO $adminData): Admin | JsonResponse
+    public function createAdmin(AdminDTO $adminData, UploadedFile $file = null): Admin | JsonResponse
     {
-    var_dump($adminData);
         if($this->validateData($adminData))
         {
             return new JsonResponse([
@@ -58,9 +61,21 @@ class AdminServices
 
         $strategy = new AdminStrategyFactory($adminData);
         $adminCreator = new AdminCreator($this->adminRepository);
+        $admin = $adminCreator->setStrategy($strategy->createAdminStrategy())->createAdmin($adminData);
 
-        return $adminCreator->setStrategy($strategy->createAdminStrategy())->createAdmin($adminData);
-//        return new JsonResponse("działa");
+        if($file !== null) {
+            $this->saveAdminFile($file, $admin);
+        }
+
+        return $admin;
+    }
+
+    private function saveAdminFile(UploadedFile $file, Admin $admin) : void
+    {
+        $newFile = new FileService($file, $admin);
+        $preparedFile = $newFile->prepareFile();
+        $this->fileRepository->save($preparedFile);
+//            $admin->addFile($preparedFile); // tym sposobem mam circular reference
     }
 
     /**

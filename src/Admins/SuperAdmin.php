@@ -20,25 +20,23 @@ class SuperAdmin implements AdminCreatorStrategyInterface
         $admin->setSecondName($adminData->secondName);
         $admin->setEmail($adminData->email);
         $admin->setEmployeeCode($adminData->employeeCode);
-        echo ":::::::::::::::::::::::::::::::::::::::::::I AM IN:::::::::::::::::::::::::::::::::::::::";
-        var_dump($adminData->files['fileName']);
-        if (!empty($adminData->files)) {
+//        echo ":::::::::::::::::::::::::::::::::::::::::::I AM IN:::::::::::::::::::::::::::::::::::::::";
+//        var_dump($adminData->files['fileName']);
+//        if (!empty($adminData->files)) {
+//
+//
+//                $uploadedFile = new File();
+//                $uploadedFile
+//                    ->setFileName($adminData->files['fileName'])
+//                    ->setPath($adminData->files['path'])
+//                    ->setRelation($admin)
+//                    ->setUploadDate('2022-03-22');
+//
+//
+//                $admin->addFile($uploadedFile);
+//
+//            }
 
-//            foreach ($adminData->files as $file) {
-
-                $uploadedFile = new File();
-                $uploadedFile
-                    ->setFileName($adminData->files['fileName'])
-                    ->setPath($adminData->files['path'])
-                    ->setRelation($admin)
-                    ->setUploadDate('2022-03-22');
-
-
-                $admin->addFile($uploadedFile);
-
-            }
-//            print_r($admin);
-//        }
         return $admin;
     }
 

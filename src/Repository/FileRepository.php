@@ -22,7 +22,7 @@ class FileRepository extends ServiceEntityRepository
         parent::__construct($registry, File::class);
     }
 
-    public function save(Collection $file): Collection
+    public function save(File $file): File
     {
 
         $this->getEntityManager()->persist($file);

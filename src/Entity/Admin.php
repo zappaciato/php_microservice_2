@@ -17,9 +17,9 @@ class Admin
 
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\Column(type: 'string', unique: true)]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
-    private ?string $id = null;
+    private ?Uuid $id = null;
 
 
     #[ORM\Column(length: 255)]
@@ -37,20 +37,16 @@ class Admin
     #[ORM\Column(length: 255, unique: false)]
     private ?string $employeeCode = null;
 
-
-    #[ORM\OneToMany(mappedBy: 'admin', targetEntity: File::class, cascade: ['persist'], orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'admin', targetEntity: File::class, cascade: ['persist'])]
     private Collection $files;
-
 
     public function __construct()
     {
         $this->files = new ArrayCollection();
     }
 
-//    public function __construct()
-//    {
-//        $this->id = Uuid::v4();
-//    }
+
+
 
     public function getId(): ?string
     {
@@ -121,10 +117,9 @@ class Admin
 
     public function addFile(File $file): static
     {
-
         if (!$this->files->contains($file)) {
             $this->files->add($file);
-            $file->setRelation($this);
+            $file->setAdmin($this);
         }
 
         return $this;
@@ -134,11 +129,13 @@ class Admin
     {
         if ($this->files->removeElement($file)) {
             // set the owning side to null (unless already changed)
-            if ($file->getRelation() === $this) {
-                $file->setRelation(null);
+            if ($file->getAdmin() === $this) {
+                $file->setAdmin(null);
             }
         }
 
         return $this;
     }
+
+
 }

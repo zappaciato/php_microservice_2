@@ -15,40 +15,27 @@ class File
 
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\Column(type: 'string', unique: true)]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     private ?Uuid $id = null;
-
 
     #[ORM\Column(length: 255)]
     private ?string $fileName = null;
 
-
     #[ORM\Column(length: 255)]
     private ?string $path = null;
 
-
-
     #[ORM\ManyToOne(inversedBy: 'files')]
-    #[ORM\JoinColumn(nullable: true)]
-    private ?Admin $relation = null;
-
-
-//    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-//    private ?\DateTimeInterface $uploadDate = null;
-//
-    private string $uploadDate = '';
+    private ?Admin $admin = null;
 
     public function getId(): ?Uuid
     {
         return $this->id;
     }
 
-    public function setId(Uuid $id): static
+    public function setId(?Uuid $id): void
     {
         $this->id = $id;
-
-        return $this;
     }
 
     public function getFileName(): ?string
@@ -56,11 +43,9 @@ class File
         return $this->fileName;
     }
 
-    public function setFileName($fileName): static
+    public function setFileName(?string $fileName): void
     {
         $this->fileName = $fileName;
-
-        return $this;
     }
 
     public function getPath(): ?string
@@ -68,34 +53,21 @@ class File
         return $this->path;
     }
 
-    public function setPath(string $path): static
+    public function setPath(?string $path): void
     {
         $this->path = $path;
+    }
+
+    public function getAdmin(): ?Admin
+    {
+        return $this->admin;
+    }
+
+    public function setAdmin(?Admin $admin): static
+    {
+        $this->admin = $admin;
 
         return $this;
     }
 
-    public function getRelation(): ?Admin
-    {
-        return $this->relation;
-    }
-
-    public function setRelation(?Admin $relation): static
-    {
-        $this->relation = $relation;
-
-        return $this;
-    }
-
-    public function getUploadDate(): ?string
-    {
-        return $this->uploadDate;
-    }
-
-    public function setUploadDate(string $uploadDate): static
-    {
-        $this->uploadDate = $uploadDate;
-
-        return $this;
-    }
-}
+ }
