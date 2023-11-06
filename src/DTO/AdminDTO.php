@@ -1,9 +1,11 @@
 <?php
 namespace App\DTO;
 
+use App\Entity\File;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\Type;
@@ -21,7 +23,7 @@ class AdminDTO
     /**
      * @SerializedName("firstName")
      */
-    #[Groups('adminDTO')]
+//    #[Groups('adminDTO')]
     #[Assert\NotNull, NotBlank]
     #[Length(max: 9)]
     public string $firstName = '';
@@ -29,7 +31,7 @@ class AdminDTO
     /**
      * @SerializedName("secondName")
      */
-    #[Groups('adminDTO')]
+//    #[Groups('adminDTO')]
     #[Assert\NotNull]
     #[NotBlank]
     public string $secondName = '';
@@ -37,7 +39,7 @@ class AdminDTO
     /**
      * @SerializedName("email")
      */
-    #[Groups('adminDTO')]
+//    #[Groups('adminDTO')]
     #[Assert\NotNull]
     #[NotBlank]
     #[Email(
@@ -48,7 +50,7 @@ class AdminDTO
     /**
      * @SerializedName("employeeCode")
      */
-    #[Groups('adminDTO')]
+//    #[Groups('adminDTO')]
     #[Assert\NotNull]
     #[NotBlank]
     #[Type('string')]
@@ -59,15 +61,16 @@ class AdminDTO
 //    )]
     public string $employeeCode = '';
 
-    /**
-     * @SerializedName("files")
-     */
+
 //    #[Type('FileDTO')]
 //    /** @var $files FileDTO<FileDTO>  */
 //    public FileDTO $files;
-    #[Groups('adminDTO')]
-    #[MaxDepth(2)]
+
+    /**
+     * @Exclude
+     */
+    #[Ignore]
     #[Type('array')]
-    /** @var $files array<FileDTO>  */
+    /** @var $files array<File>  */
     public array $files;
 }

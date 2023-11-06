@@ -19,7 +19,7 @@ class Admin
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\Column(type: 'string', unique: true)]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
-    private ?Uuid $id = null;
+    private  $id = null;
 
 
     #[ORM\Column(length: 255)]

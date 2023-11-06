@@ -30,6 +30,14 @@ class FileRepository extends ServiceEntityRepository
 
         return $file;
     }
+
+    public function delete(File $file): File
+    {
+        $this->getEntityManager()->remove($file);
+        $this->getEntityManager()->flush();
+
+        return $file;
+    }
 //    /**
 //     * @return File[] Returns an array of File objects
 //     */

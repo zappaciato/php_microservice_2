@@ -7,6 +7,7 @@ use App\Entity\Admin;
 use App\Entity\File;
 use App\Repository\FileRepository;
 use App\Services\AdminServices;
+use App\Services\FileService;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -25,11 +26,10 @@ class AdminController extends AbstractController
     }
 
     /**
-     * @param Request $request
      * @return JsonResponse
      */
     #[Route('/admins', name: 'app_admins', methods: ['GET'])]
-    public function index(Request $request): JsonResponse
+    public function index(): JsonResponse
     {
         $admins = $this->adminServices->getAllAdmins();
 
@@ -45,7 +45,7 @@ class AdminController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/admins/{id}', name: 'app_admin', methods: ['GET'])]
-    public function getUserById(string $id): JsonResponse
+    public function getAdminById(string $id): JsonResponse
     {
         $admin = $this->adminServices->findAdminById($id);
         if(empty($admin)) {
@@ -53,25 +53,72 @@ class AdminController extends AbstractController
             return new JsonResponse(['message' => 'Admin not found', 'admin' => $admin], 404);
         }
 
+        //link to files
+//        $this->getAdminFiles($admin->getId())
+
         return $this->json($admin, 200, ['message' => 'Admin found!!!'], []);
     }
 
-    /**
-     * @param Request $request
-     * @param SerializerInterface $serializer
-     * @return JsonResponse
-     */
+    #[Route('/admins/{id}/files', name: 'admin_files', methods: ['GET'])]
+    public function getAdminFiles(string $id): JsonResponse
+    {
+        $admin = $this->adminServices->findAdminById($id);
+//        $files = $admin->getFiles();//circular reference error with this way
+        $files = $this->adminServices->getAdminFiles($admin); //równie circular reference
+
+        if(count($files) === 0) {
+
+            return new JsonResponse(['message' => 'Files not found', 'files' => $files], 404);
+        }
+
+        return $this->json($files, 200, ['message' => 'Success!'], []);
+    }
+
+    #[Route('/admins/files', name: 'all_files', methods: ['GET'])]
+    public function getAllFiles(): JsonResponse
+    {
+        $files = $this->adminServices->getAllFiles();
+
+        $count = count($files);
+        $
+        if(count($files) === 0) {
+
+            return new JsonResponse(['message' => 'Files not found', 'files' => $files], 404);
+        }
+
+        return $this->json($files, 200, ['message' => 'Success!', 'count' => $count], []);
+    }
+
     #[Route('/admins ', name: 'create_admin', methods: ['POST'])]
     public function createAdmin(Request $request, SerializerInterface $serializer): JsonResponse
     {
         $requestData = $request->request->all();
         $file =  $request->files->get('file');
 
-        $adminData = $serializer->denormalize($requestData, AdminDTO::class, "array", ['groups' => 'adminDTO']);
+        $adminData = $serializer->denormalize($requestData, AdminDTO::class, "array");
 
         $admin = $this->adminServices->createAdmin($adminData, $file);
 
         return $this->json($admin, 200, ['message' => 'New Admin added!'], []);
+
+    }
+
+    #[Route('/admins/{id}/files ', name: 'create_admin', methods: ['POST'])]
+    public function addFile(Request $request, $id): JsonResponse
+    {
+
+        $file =  $request->files->get('file');
+        $admin = $this->adminServices->findAdminById($id);
+        $this->adminServices->saveAdminFile($file, $admin);
+
+        return $this->json($id, 200, ['message' => 'New Admin added!'], []);
+
+    }
+
+    #[Route('/admins/{adminId}/files/{fileId}/delete ', name: 'create_admin', methods: ['DELETE'])]
+    public function removeFile($adminId, $fileId): JsonResponse
+    {
+        return $this->adminServices->removeFile($adminId, $fileId);
 
     }
 
@@ -85,14 +132,14 @@ class AdminController extends AbstractController
     #[Route('/admins/{id} ', name: 'update_admin', methods: ['PUT'])]
     public function updateAdmin($id, Request $request, SerializerInterface $serializer): JsonResponse
     {
-        try {
+//        try {
             $updatedAdminDTO = $serializer->deserialize($request->getContent(), AdminDTO::class, "json");
             $admin = $this->adminServices->updateAdmin($updatedAdminDTO, $id);
 
-        } catch(Exception $e) {
-
-            return $this->json('Unforseen Error Occurred!'.$e);
-        }
+//        } catch(Exception $e) {
+//
+//            return $this->json('Unforseen Error Occurred!'.$e);
+//        }
 
         return $this->json($admin, 200, ['message' => 'Admin updated!'], []);
     }

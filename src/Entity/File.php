@@ -17,7 +17,7 @@ class File
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\Column(type: 'string', unique: true)]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
-    private ?Uuid $id = null;
+    private  $id = null;
 
     #[ORM\Column(length: 255)]
     private ?string $fileName = null;
@@ -28,12 +28,12 @@ class File
     #[ORM\ManyToOne(inversedBy: 'files')]
     private ?Admin $admin = null;
 
-    public function getId(): ?Uuid
+    public function getId(): ?string
     {
         return $this->id;
     }
 
-    public function setId(?Uuid $id): void
+    public function setId(?string $id): void
     {
         $this->id = $id;
     }
