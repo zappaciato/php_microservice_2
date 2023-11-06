@@ -16,7 +16,6 @@ class AdminServices
 {
     private AdminRepository $adminRepository;
     private ValidatorInterface $validator;
-    private FileService $fileService;
     private FileRepository $fileRepository;
 
     public function __construct(AdminRepository $adminRepository, ValidatorInterface $validator, FileRepository $fileRepository)
@@ -27,7 +26,7 @@ class AdminServices
     }
 
     /**
-     * @return array<Admin|null>
+     * @return array|null
      */
     public function getAllAdmins(): array | null
     {
@@ -92,16 +91,24 @@ class AdminServices
      */
     public function saveAdminFile(UploadedFile $file, Admin $admin) : void
     {
-        $newFile = new FileService($file, $admin);
-        $preparedFile = $newFile->prepareFile();
-        $this->fileRepository->save($preparedFile);
+
+        $newFile = new File();
+        $newFile->setFileName($file->getFilename());
+        $newFile->setPath($file->getPath());
+        $admin->addFile($newFile);
+        $this->adminRepository->save($admin);
+
+
+//        $newFile = new FileService($file, $admin);
+//        $preparedFile = $newFile->prepareFile();
+//        $this->fileRepository->save($preparedFile);
 //            $admin->addFile($preparedFile); // tym sposobem mam circular reference
     }
 
     /**
      * @param AdminDTO $adminDto
      * @param $id
-     * @return Admin
+     * @return Admin|JsonResponse
      * @throws \Exception
      */
     public function updateAdmin(AdminDTO $adminDto, $id): Admin | JsonResponse
