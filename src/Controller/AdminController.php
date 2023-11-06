@@ -40,24 +40,7 @@ class AdminController extends AbstractController
         return $this->json($admins);
     }
 
-    /**
-     * @param string $id
-     * @return JsonResponse
-     */
-    #[Route('/admins/{id}', name: 'app_admin', methods: ['GET'])]
-    public function getAdminById(string $id): JsonResponse
-    {
-        $admin = $this->adminServices->findAdminById($id);
-        if(empty($admin)) {
 
-            return new JsonResponse(['message' => 'Admin not found', 'admin' => $admin], 404);
-        }
-
-        //link to files
-//        $this->getAdminFiles($admin->getId())
-
-        return $this->json($admin, 200, ['message' => 'Admin found!!!'], []);
-    }
 
     #[Route('/admins/{id}/files', name: 'admin_files', methods: ['GET'])]
     public function getAdminFiles(string $id): JsonResponse
@@ -81,14 +64,33 @@ class AdminController extends AbstractController
 
         $count = count($files);
 
-
-
         if(count($files) === 0) {
 
-            return new JsonResponse(['message' => 'Files not found', 'files' => $files], 404);
+            return new JsonResponse(['message' => 'Files not found'], 404);
         }
 
         return $this->json($files, 200, ['message' => 'Success!', 'count' => $count], []);
+    }
+
+    /**
+     * @param string $id
+     * @return JsonResponse
+     */
+
+    // /admins?id=809-89-080
+    #[Route('/admins/{id}', name: 'app_admin', methods: ['GET'])]
+    public function getAdminById(string $id): JsonResponse
+    {
+        $admin = $this->adminServices->findAdminById($id);
+        if(empty($admin)) {
+
+            return new JsonResponse(['message' => 'Admin not found', 'admin' => $admin], 404);
+        }
+
+        //link to files
+//        $this->getAdminFiles($admin->getId())
+
+        return $this->json($admin, 200, ['message' => 'Admin found!!!'], []);
     }
 
     #[Route('/admins ', name: 'create_admin', methods: ['POST'])]
@@ -96,7 +98,7 @@ class AdminController extends AbstractController
     {
         $requestData = $request->request->all();
         $file =  $request->files->get('file');
-
+//    dd($requestData); request get content type format. TODO
         $adminData = $serializer->denormalize($requestData, AdminDTO::class, "array");
 
         $admin = $this->adminServices->createAdmin($adminData, $file);
@@ -105,7 +107,7 @@ class AdminController extends AbstractController
 
     }
 
-    #[Route('/admins/{id}/files ', name: 'create_admin', methods: ['POST'])]
+    #[Route('/admins/{id}/files ', name: 'admin_file', methods: ['POST'])]
     public function addFile(Request $request, $id): JsonResponse
     {
 
@@ -117,7 +119,7 @@ class AdminController extends AbstractController
 
     }
 
-    #[Route('/admins/{adminId}/files/{fileId}/delete ', name: 'create_admin', methods: ['DELETE'])]
+    #[Route('/admins/{adminId}/files/{fileId}/delete ', name: 'delete_file', methods: ['DELETE'])]
     public function removeFile($adminId, $fileId): JsonResponse
     {
         return $this->adminServices->removeFile($adminId, $fileId);

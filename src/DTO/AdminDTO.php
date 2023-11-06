@@ -23,7 +23,7 @@ class AdminDTO
     /**
      * @SerializedName("firstName")
      */
-//    #[Groups('adminDTO')]
+    #[Groups('adminDTO')]
     #[Assert\NotNull, NotBlank]
     #[Length(max: 9)]
     public string $firstName = '';
@@ -31,7 +31,7 @@ class AdminDTO
     /**
      * @SerializedName("secondName")
      */
-//    #[Groups('adminDTO')]
+    #[Groups('adminDTO')]
     #[Assert\NotNull]
     #[NotBlank]
     public string $secondName = '';
@@ -39,7 +39,7 @@ class AdminDTO
     /**
      * @SerializedName("email")
      */
-//    #[Groups('adminDTO')]
+    #[Groups('adminDTO')]
     #[Assert\NotNull]
     #[NotBlank]
     #[Email(
@@ -50,7 +50,7 @@ class AdminDTO
     /**
      * @SerializedName("employeeCode")
      */
-//    #[Groups('adminDTO')]
+    #[Groups('adminDTO')]
     #[Assert\NotNull]
     #[NotBlank]
     #[Type('string')]
