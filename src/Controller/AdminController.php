@@ -80,7 +80,9 @@ class AdminController extends AbstractController
         $files = $this->adminServices->getAllFiles();
 
         $count = count($files);
-        $
+
+
+
         if(count($files) === 0) {
 
             return new JsonResponse(['message' => 'Files not found', 'files' => $files], 404);
