@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Context\Normalizer\ObjectNormalizerContextBuilder;
+use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Constraints\DateTime;
 
@@ -29,15 +30,19 @@ class AdminController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/admins', name: 'app_admins', methods: ['GET'])]
-    public function index(): JsonResponse
+    public function index(SerializerInterface $serializer): JsonResponse
     {
         $admins = $this->adminServices->getAllAdmins();
 
         if(count($admins) === 0) {
             return new JsonResponse(['message' => 'No users found'], 404); //no content status/ dobrze to zrobic HTTP::
         }
-
-        return $this->json($admins);
+        $context = [
+            'groups' => ['read'],
+            'max_depth' => 2,
+        ];
+        $adminsJson = $serializer->serialize($admins, 'json', $context);
+        return new JsonResponse(json_decode($adminsJson));
     }
 
 
@@ -102,9 +107,13 @@ class AdminController extends AbstractController
         $adminData = $serializer->denormalize($requestData, AdminDTO::class, "array");
 
         $admin = $this->adminServices->createAdmin($adminData, $file);
+        $context = [
+            'groups' => ['read'],
 
-        return $this->json($admin, 200, ['message' => 'New Admin added!'], []);
+        ];
+        $adminJson = $serializer->serialize($admin, 'json', $context);
 
+    return new JsonResponse(json_decode($adminJson));
     }
 
     #[Route('/admins/{id}/files ', name: 'admin_file', methods: ['POST'])]
@@ -125,7 +134,6 @@ class AdminController extends AbstractController
         return $this->adminServices->removeFile($adminId, $fileId);
 
     }
-
 
 
     /**

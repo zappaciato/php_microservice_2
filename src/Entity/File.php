@@ -13,15 +13,16 @@ use Symfony\Component\Uid\Uuid;
 class File
 {
 
+//    #[Groups('read')]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\Column(type: 'string', unique: true)]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     private  $id = null;
-
+    #[Groups('read')]
     #[ORM\Column(length: 255)]
     private ?string $fileName = null;
-
+    #[Groups('read')]
     #[ORM\Column(length: 255)]
     private ?string $path = null;
 
