@@ -9,6 +9,7 @@ use App\Providers\EmployeeCodeCustomProvider;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
+use Faker\Generator;
 
 class AdminFixture extends Fixture
 {
@@ -31,7 +32,7 @@ class AdminFixture extends Fixture
 //            $admin->setEmployeeCode($faker->customEmployeeCodeFormat());
             $admin->setEmployeeCode('AA11BB');
 
-            $admin->addFile($this->generateFile($admin, $manager));
+            $admin->addFile($this->generateFile($faker, $admin, $manager));
 
             $manager->persist($admin);
         }
@@ -39,16 +40,23 @@ class AdminFixture extends Fixture
         $manager->flush();
     }
 
-    private function generateFile(Admin $admin, ObjectManager $manager) : File
+    private function generateFile(Generator $faker, Admin $admin, ObjectManager $manager) : File
     {
-        $faker = Factory::create();
+//        $faker = Factory::create();
+        $content = 'This is for Admin: ' .$admin->getEmail();
+
         $file = new File();
         $file->setFileName($faker->word.".txt");
-        $file->setPath('File/');
+        $file->setPath('Public\Files\\');
         $file->setAdmin($admin);
 
         $manager->persist($file);
 
+
+
+        file_put_contents($file->getPath().$file->getFileName(), $content);
+
         return $file;
     }
+
 }
