@@ -5,6 +5,7 @@ namespace App\Services;
 use App\DTO\AdminDTO;
 use App\Entity\Admin;
 use App\Entity\File;
+use App\Exceptions\AdminValidationException;
 use App\Repository\AdminRepository;
 use App\Repository\FileRepository;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -30,20 +31,20 @@ class AdminServices
      */
     public function getAllAdmins(): array | null
     {
-//        var_dump($this->adminRepository->findAll()[0]->getEmail());
-
         return $this->adminRepository->findAll() ?? null;
     }
 
+    /**
+     * @return array|null
+     */
     public function getAllFiles(): array | null
     {
         return $this->fileRepository->findAll() ?? null;
-
     }
 
     public function getAdminFiles(Admin $admin): array | null
     {
-        return $this->fileRepository->findBy(['admin' => $admin]) ?? null; //również circular reference
+        return $this->fileRepository->findBy(['admin' => $admin]) ?? null;
 
     }
 
@@ -61,17 +62,11 @@ class AdminServices
      * @param AdminDTO $adminData
      * @param UploadedFile|null $file
      * @return Admin|JsonResponse
-     * @throws \Exception
+     * @throws AdminValidationException
      */
     public function createAdmin(AdminDTO $adminData, UploadedFile $file = null): Admin | JsonResponse
     {
-        if($this->validateData($adminData))
-        {
-            return new JsonResponse([
-                'message' => 'Validation was not successful!',
-                'errors' => $this->validateData($adminData)
-            ]);
-        }
+        $this->validateData($adminData) && throw new AdminValidationException();
 
         $strategy = new AdminStrategyFactory($adminData);
         $adminCreator = new AdminCreator($this->adminRepository);
@@ -87,42 +82,44 @@ class AdminServices
     /**
      * @param UploadedFile $file
      * @param Admin $admin
-     * @return void
+     * @return Admin
      */
-    public function saveAdminFile(UploadedFile $file, Admin $admin) : void
+    public function saveAdminFile(UploadedFile $file, Admin $admin): Admin
     {
+        $newFile = new FileService($file, $admin);
+        $preparedFile = $newFile->prepareFile();
 
-        $newFile = new File();
-        $newFile->setFileName($file->getFilename());
-        $newFile->setPath($file->getPath());
-        $admin->addFile($newFile);
+        $admin->addFile($preparedFile);
         $this->adminRepository->save($admin);
 
-
-//        $newFile = new FileService($file, $admin);
-//        $preparedFile = $newFile->prepareFile();
-//        $this->fileRepository->save($preparedFile);
-//            $admin->addFile($preparedFile); // tym sposobem mam circular reference
+        return $admin;
     }
 
     /**
-     * @param AdminDTO $adminDto
+     * @param AdminDTO $adminData
      * @param $id
-     * @return Admin|JsonResponse
-     * @throws \Exception
+     * @return JsonResponse|Admin
+     * @throws AdminValidationException
      */
-    public function updateAdmin(AdminDTO $adminDto, $id): Admin | JsonResponse
+    public function updateAdmin(AdminDTO $adminData, $id): JsonResponse | Admin
     {
-        if($this->validateData($adminDto))  return new JsonResponse(['message' => $this->validateData($adminDto)]);
+        $this->validateData($adminData) && throw new AdminValidationException();
+
         $admin = $this->adminRepository->find($id) ?? null;
         if (!$admin) throw new \Exception();
-        $this->setAllowedUpdateFields($admin, $adminDto);
+
+        $this->setAllowedUpdateFields($admin, $adminData);
         $this->adminRepository->save($admin);
 
         return $admin;
 
     }
 
+    /**
+     * @param Admin $admin
+     * @param AdminDTO $adminDto
+     * @return void
+     */
     private function setAllowedUpdateFields(Admin $admin, AdminDTO $adminDto): void
     {
         $admin->setFirstName($adminDto->firstName);
@@ -169,17 +166,17 @@ class AdminServices
      */
     private function validateData(AdminDTO $data): array|null
     {
-
         $errors = $this->validator->validate($data);
+        $errorsArray = [];
+
         if (count($errors) > 0) {
-            $errorsString = [];
             foreach ($errors as $error) {
                 $propertyPath = $error->getPropertyPath();
                 $message = $error->getMessage();
-                $errorsString[] = "$propertyPath: $message";
+                $errorsArray[$propertyPath][] = "$propertyPath: $message";
             }
 
-            return $errorsString;
+            return $errorsArray;
         }
 
         return null;

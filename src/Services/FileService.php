@@ -18,16 +18,22 @@ class FileService
 
     }
 
+    /**
+     * @return self
+     */
     private function establishFileParameters() : self
     {
         $this->fileData = [
             'fileName' => uniqid().$this->file->getClientOriginalName(),
-            'path' => 'Files/'
+            'path' => 'Files\\'
         ];
 
         return $this;
     }
 
+    /**
+     * @return File
+     */
     private function setFileParameters() : File
     {
         $newFile = new File();
@@ -38,6 +44,9 @@ class FileService
         return $newFile;
     }
 
+    /**
+     * @return self
+     */
     private function moveToFolder() : self
     {
         $this->file->move($this->fileData['path'], $this->fileData['fileName']);
@@ -45,13 +54,13 @@ class FileService
         return $this;
     }
 
+    /**
+     * @return File
+     */
     public function prepareFile() : File
     {
         return $this->establishFileParameters()->moveToFolder()->setFileParameters();
 
     }
-
-
-
 
 }

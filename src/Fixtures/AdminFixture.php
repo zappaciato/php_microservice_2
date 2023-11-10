@@ -10,10 +10,10 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 use Faker\Generator;
+use phpDocumentor\Reflection\Types\InterfaceString;
 
 class AdminFixture extends Fixture
 {
-    //nie moge konstruktora bo metoda load musi miec argument, czy tak jest dobrze?
 
     /**
      * @inheritDoc
@@ -21,16 +21,13 @@ class AdminFixture extends Fixture
     public function load(ObjectManager $manager)
     {
         $faker = Factory::create();
-//        $employeeCode = new EmployeeCodeCustomProvider($faker);
-//        $faker->addProvider($employeeCode);
-//        $faker->addProvider(provider: new EmployeeCodeCustomProvider($faker));
+        $this->generateEmployeeCode();
         for ($i = 0; $i < 100; $i++) {
             $admin = new Admin();
             $admin->setFirstName($faker->firstName);
             $admin->setSecondName($faker->lastName);
             $admin->setEmail($faker->email);
-//            $admin->setEmployeeCode($faker->customEmployeeCodeFormat());
-            $admin->setEmployeeCode('AA11BB');
+            $admin->setEmployeeCode($this->generateEmployeeCode());
 
             $admin->addFile($this->generateFile($faker, $admin, $manager));
 
@@ -42,21 +39,32 @@ class AdminFixture extends Fixture
 
     private function generateFile(Generator $faker, Admin $admin, ObjectManager $manager) : File
     {
-//        $faker = Factory::create();
         $content = 'This is for Admin: ' .$admin->getEmail();
 
         $file = new File();
         $file->setFileName($faker->word.".txt");
-        $file->setPath('Public\Files\\');
+        $file->setPath('\Files\\');
         $file->setAdmin($admin);
 
         $manager->persist($file);
 
-
-
         file_put_contents($file->getPath().$file->getFileName(), $content);
 
         return $file;
+    }
+
+    private function generateEmployeeCode(): string
+    {
+        $letters = range('A', 'Z');
+        $numbers = range(0, 9);
+
+        return $letters[array_rand($letters)]
+            .$letters[array_rand($letters)]
+            .$numbers[array_rand($numbers)]
+            .$numbers[array_rand($numbers)]
+            .$letters[array_rand($letters)]
+            .$letters[array_rand($letters)];
+
     }
 
 }

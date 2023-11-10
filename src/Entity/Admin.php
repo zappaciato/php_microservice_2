@@ -15,7 +15,7 @@ use Symfony\Component\Uid\Uuid;
 class Admin
 {
 
-//    #[Groups('read')]
+    #[Groups('read')]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\Column(type: 'string', unique: true)]
