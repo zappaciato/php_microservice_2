@@ -11,17 +11,26 @@ class EmployeeCodeAnalyzer implements CodeAnalyzerInterface
     {
         $this->employeeCode = $employeeCode;
     }
+
+    /**
+     * @return $this
+     * @throws \Exception
+     */
     public function validateCode(): static
     {
         //validation logic
-        $pattern = '/^\d{2}[A-Z]{2}\d{2}$/';
-        if(!preg_match($pattern, $this->employeeCode)) {
+        $pattern = '/^[A-Z]{2}\d{2}[A-Z]{2}$/';
+        if(!preg_match($pattern, strtoupper($this->employeeCode))) {
 
             return throw new \Exception('Employee code is in the wrong format!');
         }
 
         return $this;
     }
+
+    /**
+     * @return $this
+     */
     public function refactorCode(): static
     {
         $this->employeeCode = strrev($this->employeeCode);
@@ -30,6 +39,10 @@ class EmployeeCodeAnalyzer implements CodeAnalyzerInterface
 
     }
 
+    /**
+     * @return string
+     * @throws \Exception
+     */
     public function extractInformationFromRefactoredCode(): string
     {
         $this->employeeCode = strtoupper($this->employeeCode);

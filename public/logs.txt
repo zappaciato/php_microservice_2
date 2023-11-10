@@ -1,0 +1,20 @@
+[{},{},{},{},{},{},{},{},{}]
+
+
+
+
+
+
+
+
+{
+"firstName":"Mike",
+"secondName":"Tyson",
+"email":"xxn@gg.pl",
+"employeeCode":"mm01SQ",
+"files":{
+    "fileName":"joker.jpg",
+    "path":"Files\/",
+    "uploadDate":"22-21-23"
+    }
+}

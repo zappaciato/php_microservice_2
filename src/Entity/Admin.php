@@ -3,36 +3,52 @@
 namespace App\Entity;
 
 use App\Repository\AdminRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: AdminRepository::class)]
 class Admin
 {
+
+    #[Groups('read')]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\Column(type: 'string', unique: true)]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
-    private ?string $id = null;
+    private $id = null;
 
+    #[Groups('read')]
     #[ORM\Column(length: 255)]
     private ?string $first_name = null;
 
+    #[Groups('read')]
     #[ORM\Column(length: 255)]
     private ?string $second_name = null;
 
-    #[ORM\Column(length: 255, unique: true)]
+    #[Groups('read')]
+    #[ORM\Column(length: 255, unique: false)]
     private ?string $email = null;
 
-    #[ORM\Column(length: 255, unique: true)]
+    #[Groups('read')]
+    #[ORM\Column(length: 255, unique: false)]
     private ?string $employeeCode = null;
 
-//    public function __construct()
-//    {
-//        $this->id = Uuid::v4();
-//    }
+    #[Groups('read')]
+    #[ORM\OneToMany(mappedBy: 'admin', targetEntity: File::class, cascade: ['persist'])]
+    private Collection $files;
+
+    public function __construct()
+    {
+        $this->files = new ArrayCollection();
+    }
+
+
+
 
     public function getId(): ?string
     {
@@ -92,4 +108,36 @@ class Admin
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, File>
+     */
+    public function getFiles(): Collection
+    {
+        return $this->files;
+    }
+
+    public function addFile(File $file): static
+    {
+        if (!$this->files->contains($file)) {
+            $this->files->add($file);
+            $file->setAdmin($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFile(File $file): static
+    {
+        if ($this->files->removeElement($file)) {
+            // set the owning side to null (unless already changed)
+            if ($file->getAdmin() === $this) {
+                $file->setAdmin(null);
+            }
+        }
+
+        return $this;
+    }
+
+
 }

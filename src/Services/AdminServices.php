@@ -4,7 +4,11 @@ namespace App\Services;
 
 use App\DTO\AdminDTO;
 use App\Entity\Admin;
+use App\Entity\File;
+use App\Exceptions\AdminValidationException;
 use App\Repository\AdminRepository;
+use App\Repository\FileRepository;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -13,20 +17,34 @@ class AdminServices
 {
     private AdminRepository $adminRepository;
     private ValidatorInterface $validator;
+    private FileRepository $fileRepository;
 
-    public function __construct(AdminRepository $adminRepository, ValidatorInterface $validator)
+    public function __construct(AdminRepository $adminRepository, ValidatorInterface $validator, FileRepository $fileRepository)
     {
         $this->adminRepository = $adminRepository;
-
         $this->validator = $validator;
+        $this->fileRepository = $fileRepository;
     }
 
     /**
-     * @return array<Admin|null>
+     * @return array|null
      */
-    public function getAllAdmins(): array
+    public function getAllAdmins(): array | null
     {
-        return $this->adminRepository->findAll();
+        return $this->adminRepository->findAll() ?? null;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getAllFiles(): array | null
+    {
+        return $this->fileRepository->findAll() ?? null;
+    }
+
+    public function getAdminFiles(Admin $admin): array | null
+    {
+        return $this->fileRepository->findBy(['admin' => $admin]) ?? null;
 
     }
 
@@ -42,44 +60,72 @@ class AdminServices
 
     /**
      * @param AdminDTO $adminData
+     * @param UploadedFile|null $file
      * @return Admin|JsonResponse
+     * @throws AdminValidationException
      */
-    public function createAdmin(AdminDTO $adminData): Admin | JsonResponse
+    public function createAdmin(AdminDTO $adminData, UploadedFile $file = null): Admin | JsonResponse
     {
-        if($this->validateData($adminData))
-        {
-            return new JsonResponse([
-                'message' => 'Validation was not successful!',
-                'errors' => $this->validateData($adminData)
-            ]);
-        }
+        $this->validateData($adminData) && throw new AdminValidationException();
 
         $strategy = new AdminStrategyFactory($adminData);
         $adminCreator = new AdminCreator($this->adminRepository);
+        $admin = $adminCreator->setStrategy($strategy->createAdminStrategy())->createAdmin($adminData);
 
-        return $adminCreator->setStrategy($strategy->createAdminStrategy())->createAdmin($adminData);
+        if($file !== null) {
+            $this->saveAdminFile($file, $admin);
+        }
+
+        return $admin;
     }
 
     /**
-     * @param AdminDTO $adminDto
-     * @param $id
+     * @param UploadedFile $file
+     * @param Admin $admin
      * @return Admin
-     * @throws \Exception
      */
-    public function updateAdmin(AdminDTO $adminDto, $id): Admin
+    public function saveAdminFile(UploadedFile $file, Admin $admin): Admin
     {
-        $this->validateData($adminDto) && throw new \Exception();
+        $newFile = new FileService($file, $admin);
+        $preparedFile = $newFile->prepareFile();
+
+        $admin->addFile($preparedFile);
+        $this->adminRepository->save($admin);
+
+        return $admin;
+    }
+
+    /**
+     * @param AdminDTO $adminData
+     * @param $id
+     * @return JsonResponse|Admin
+     * @throws AdminValidationException
+     */
+    public function updateAdmin(AdminDTO $adminData, $id): JsonResponse | Admin
+    {
+        $this->validateData($adminData) && throw new AdminValidationException();
 
         $admin = $this->adminRepository->find($id) ?? null;
         if (!$admin) throw new \Exception();
-        $admin->setFirstName($adminDto->firstName);
-        $admin->setSecondName($adminDto->secondName);
-        $admin->setEmail($adminDto->email);
 
+        $this->setAllowedUpdateFields($admin, $adminData);
         $this->adminRepository->save($admin);
 
         return $admin;
 
+    }
+
+    /**
+     * @param Admin $admin
+     * @param AdminDTO $adminDto
+     * @return void
+     */
+    private function setAllowedUpdateFields(Admin $admin, AdminDTO $adminDto): void
+    {
+        $admin->setFirstName($adminDto->firstName);
+        $admin->setSecondName($adminDto->secondName);
+        $admin->setEmail($adminDto->email);
+        $admin->setEmployeeCode($adminDto->employeeCode);
     }
 
     /**
@@ -91,10 +137,27 @@ class AdminServices
     {
         $admin = $this->adminRepository->find($id) ?? null;
         if (!$admin) throw new \Exception();
-
         $this->adminRepository->delete($admin);
 
         return $admin;
+    }
+
+    public function removeFile($adminId, $fileId) : Admin | JsonResponse
+    {
+        $admin = $this->adminRepository->find($adminId) ?? null;
+        $files = $admin->getFiles();
+
+        foreach($files as $file) {
+            if($file->getId() === $fileId) {
+                print_r($file->getFileName());
+                $admin->removeFile($file);
+                $this->fileRepository->delete($file);
+
+                return new JsonResponse(['message' => 'The file '.$file->getFileName().' has been successfully removed!']);
+            }
+        }
+
+        return new JsonResponse(['message' => 'All files for the admin '.$admin->getFirstName(). ' ' .$admin->getSecondName().' have been removed!']);
     }
 
     /**
@@ -103,19 +166,17 @@ class AdminServices
      */
     private function validateData(AdminDTO $data): array|null
     {
-
         $errors = $this->validator->validate($data);
+        $errorsArray = [];
 
         if (count($errors) > 0) {
-
-            $errorsString = [];
             foreach ($errors as $error) {
                 $propertyPath = $error->getPropertyPath();
                 $message = $error->getMessage();
-                $errorsString[] = "$propertyPath: $message";
+                $errorsArray[$propertyPath][] = "$propertyPath: $message";
             }
 
-            return $errorsString;
+            return $errorsArray;
         }
 
         return null;

@@ -1,0 +1,1 @@
+{"firstName":"Mike","secondName":"Tyson","email":"xxn@gg.pl","employeeCode":"mm01SQ","files":{"fileName":"joker.jpg","path":"Files\/","uploadDate":"2023-11-02T22:21:23"}}

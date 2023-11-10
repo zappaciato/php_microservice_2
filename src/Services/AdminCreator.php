@@ -7,6 +7,7 @@ use App\DTO\AdminDTO;
 use App\interfaces\AdminCreatorStrategyInterface;
 use App\Interfaces\AdminStrategyInterface;
 use App\Repository\AdminRepository;
+use App\Repository\FileRepository;
 
 class AdminCreator
 {
@@ -50,6 +51,5 @@ class AdminCreator
         $this->adminRepository->save($admin);
 
         return $admin;
-
     }
 }

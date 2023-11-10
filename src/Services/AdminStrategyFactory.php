@@ -19,10 +19,14 @@ class AdminStrategyFactory
 
     }
 
+    /**
+     * @return AdminCreatorStrategyInterface
+     * @throws \Exception
+     */
     public function createAdminStrategy(): AdminCreatorStrategyInterface
     {
         $code = new EmployeeCodeAnalyzer($this->adminData->employeeCode);
-print_r($this->adminData->employeeCode);
+
         return
             match ($code->validateCode()->refactorCode()->extractInformationFromRefactoredCode()) {
             "SuperAdmin"    => new SuperAdmin(),
