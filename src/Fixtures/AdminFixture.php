@@ -5,12 +5,11 @@ namespace App\Fixtures;
 
 use App\Entity\Admin;
 use App\Entity\File;
-use App\Providers\EmployeeCodeCustomProvider;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 use Faker\Generator;
-use phpDocumentor\Reflection\Types\InterfaceString;
+
 
 class AdminFixture extends Fixture
 {
@@ -55,16 +54,31 @@ class AdminFixture extends Fixture
 
     private function generateEmployeeCode(): string
     {
-        $letters = range('A', 'Z');
-        $numbers = range(0, 9);
+        $codeGenerator = new EmployeeCodeGenerator();
 
-        return $letters[array_rand($letters)]
-            .$letters[array_rand($letters)]
-            .$numbers[array_rand($numbers)]
-            .$numbers[array_rand($numbers)]
-            .$letters[array_rand($letters)]
-            .$letters[array_rand($letters)];
+        return $codeGenerator->generateCode();
+
+    }
+    private function drawLetter(): string
+    {
+        $letters = range('A', 'Z');
+
+        return $letters[array_rand($letters)];
 
     }
 
+    private function drawDigit(): int
+    {
+        $digit = range(0, 9);
+
+        return $digit[array_rand($digit)];
+    }
+
 }
+
+//$code =  $letters[array_rand($letters)]
+//            .$letters[array_rand($letters)]
+//            .$numbers[array_rand($numbers)]
+//            .$numbers[array_rand($numbers)]
+//            .$letters[array_rand($letters)]
+//            .$letters[array_rand($letters)];
