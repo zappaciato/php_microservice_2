@@ -23,11 +23,11 @@ class AdminController extends AbstractController
     }
 
     /**
-     * @param SerializerInterface $serializer
+     * @param Request $request
      * @return JsonResponse
      */
     #[Route('/admins', name: 'app_admins', methods: ['GET'])]
-    public function index(SerializerInterface $serializer, Request $request): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         $admins = $this->adminServices->getAllAdmins();
 
