@@ -8,6 +8,7 @@ use App\Entity\File;
 use App\Exceptions\AdminValidationException;
 use App\Repository\AdminRepository;
 use App\Repository\FileRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -31,7 +32,7 @@ class AdminServices
      */
     public function getAllAdmins(): array | null
     {
-        return $this->adminRepository->findAll() ?? null;
+           return $this->adminRepository->findAll() ?? null;
     }
 
     /**

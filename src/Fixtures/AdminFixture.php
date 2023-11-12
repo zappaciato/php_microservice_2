@@ -5,12 +5,11 @@ namespace App\Fixtures;
 
 use App\Entity\Admin;
 use App\Entity\File;
-use App\Providers\EmployeeCodeCustomProvider;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 use Faker\Generator;
-use phpDocumentor\Reflection\Types\InterfaceString;
+
 
 class AdminFixture extends Fixture
 {

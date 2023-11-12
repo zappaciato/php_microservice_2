@@ -1,0 +1,9 @@
+knp_paginator:
+  page_range: 5 # Number of pages in the pagination control (e.g., "3" will show "<< < 1 2 3 > >>")
+  default_options:
+    page_name: page # Page parameter name
+    sort_field_name: sort # Sort field parameter name
+    sort_direction_name: direction # Sort direction parameter name
+    distinct: true # Whether the distinct option is enabled by default
+  template:
+    pagination: '@KnpPaginator/Pagination/twitter_bootstrap_v4_pagination.html.twig' # Paginator template

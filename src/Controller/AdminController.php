@@ -5,7 +5,9 @@ namespace App\Controller;
 use App\DTO\AdminDTO;
 use App\ReusableData\CustomGroups;
 use App\Services\AdminServices;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Exception;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,7 +17,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class AdminController extends AbstractController
 {
-    public function __construct(private readonly AdminServices $adminServices)
+    public function __construct(private readonly AdminServices $adminServices, private readonly PaginatorInterface $paginator)
     {
 
     }
@@ -25,7 +27,7 @@ class AdminController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/admins', name: 'app_admins', methods: ['GET'])]
-    public function index(SerializerInterface $serializer): JsonResponse
+    public function index(SerializerInterface $serializer, Request $request): JsonResponse
     {
         $admins = $this->adminServices->getAllAdmins();
 
@@ -33,7 +35,14 @@ class AdminController extends AbstractController
             return new JsonResponse(['message' => 'No users found'], 404); //no content status/ dobrze to zrobic HTTP::
         }
 
-        return $this->json($admins, 200, [], CustomGroups::$contextRead);
+        $paginatedAdmins = $this->paginator->paginate(
+            $admins,
+            $request->query->getInt('page', 1),
+            3
+        );
+
+
+        return $this->json($paginatedAdmins, 200, [], CustomGroups::$contextRead);
     }
 
 
